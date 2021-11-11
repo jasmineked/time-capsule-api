@@ -4,11 +4,11 @@ const presentSchema = new mongoose.Schema(
   {
     subject: {
       type: String,
-      required: false,
+      required: false
     },
     text: {
       type: String,
-      required: true,
+      required: true
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
