@@ -1,6 +1,6 @@
 process.env.TESTENV = true
 
-let Example = require('../app/models/example.js')
+let Example = require('../app/models/present.js')
 let User = require('../app/models/user')
 
 const crypto = require('crypto')
@@ -41,35 +41,35 @@ describe('Examples', () => {
       .catch(console.error)
   })
 
-  describe('GET /examples', () => {
-    it('should get all the examples', done => {
+  describe('GET /presents', () => {
+    it('should get all the presents', done => {
       chai.request(server)
-        .get('/examples')
+        .get('/presents')
         .set('Authorization', `Token token=${token}`)
         .end((e, res) => {
           res.should.have.status(200)
-          res.body.examples.should.be.a('array')
-          res.body.examples.length.should.be.eql(1)
+          res.body.presents.should.be.a('array')
+          res.body.presents.length.should.be.eql(1)
           done()
         })
     })
   })
 
-  describe('GET /examples/:id', () => {
-    it('should get one example', done => {
+  describe('GET /presents/:id', () => {
+    it('should get one present', done => {
       chai.request(server)
-        .get('/examples/' + exampleId)
+        .get('/presents/' + exampleId)
         .set('Authorization', `Token token=${token}`)
         .end((e, res) => {
           res.should.have.status(200)
-          res.body.example.should.be.a('object')
-          res.body.example.title.should.eql(exampleParams.title)
+          res.body.present.should.be.a('object')
+          res.body.present.title.should.eql(exampleParams.title)
           done()
         })
     })
   })
 
-  describe('DELETE /examples/:id', () => {
+  describe('DELETE /presents/:id', () => {
     let exampleId
 
     before(done => {
@@ -83,7 +83,7 @@ describe('Examples', () => {
 
     it('must be owned by the user', done => {
       chai.request(server)
-        .delete('/examples/' + exampleId)
+        .delete('/presents/' + exampleId)
         .set('Authorization', `Bearer notarealtoken`)
         .end((e, res) => {
           res.should.have.status(401)
@@ -93,7 +93,7 @@ describe('Examples', () => {
 
     it('should be succesful if you own the resource', done => {
       chai.request(server)
-        .delete('/examples/' + exampleId)
+        .delete('/presents/' + exampleId)
         .set('Authorization', `Bearer ${token}`)
         .end((e, res) => {
           res.should.have.status(204)
@@ -103,7 +103,7 @@ describe('Examples', () => {
 
     it('should return 404 if the resource doesn\'t exist', done => {
       chai.request(server)
-        .delete('/examples/' + exampleId)
+        .delete('/presents/' + exampleId)
         .set('Authorization', `Bearer ${token}`)
         .end((e, res) => {
           res.should.have.status(404)
@@ -112,16 +112,16 @@ describe('Examples', () => {
     })
   })
 
-  describe('POST /examples', () => {
-    it('should not POST an example without a title', done => {
+  describe('POST /presents', () => {
+    it('should not POST an present without a title', done => {
       let noTitle = {
         text: 'Untitled',
         owner: 'fakedID'
       }
       chai.request(server)
-        .post('/examples')
+        .post('/presents')
         .set('Authorization', `Bearer ${token}`)
-        .send({ example: noTitle })
+        .send({ present: noTitle })
         .end((e, res) => {
           res.should.have.status(422)
           res.should.be.a('object')
@@ -129,15 +129,15 @@ describe('Examples', () => {
         })
     })
 
-    it('should not POST an example without text', done => {
+    it('should not POST an present without text', done => {
       let noText = {
-        title: 'Not a very good example, is it?',
+        title: 'Not a very good present, is it?',
         owner: 'fakeID'
       }
       chai.request(server)
-        .post('/examples')
+        .post('/presents')
         .set('Authorization', `Bearer ${token}`)
-        .send({ example: noText })
+        .send({ present: noText })
         .end((e, res) => {
           res.should.have.status(422)
           res.should.be.a('object')
@@ -147,35 +147,35 @@ describe('Examples', () => {
 
     it('should not allow a POST from an unauthenticated user', done => {
       chai.request(server)
-        .post('/examples')
-        .send({ example: exampleParams })
+        .post('/presents')
+        .send({ present: exampleParams })
         .end((e, res) => {
           res.should.have.status(401)
           done()
         })
     })
 
-    it('should POST an example with the correct params', done => {
+    it('should POST an present with the correct params', done => {
       let validExample = {
         title: 'I ran a shell command. You won\'t believe what happened next!',
         text: 'it was rm -rf / --no-preserve-root'
       }
       chai.request(server)
-        .post('/examples')
+        .post('/presents')
         .set('Authorization', `Bearer ${token}`)
-        .send({ example: validExample })
+        .send({ present: validExample })
         .end((e, res) => {
           res.should.have.status(201)
           res.body.should.be.a('object')
-          res.body.should.have.property('example')
-          res.body.example.should.have.property('title')
-          res.body.example.title.should.eql(validExample.title)
+          res.body.should.have.property('present')
+          res.body.present.should.have.property('title')
+          res.body.present.title.should.eql(validExample.title)
           done()
         })
     })
   })
 
-  describe('PATCH /examples/:id', () => {
+  describe('PATCH /presents/:id', () => {
     let exampleId
 
     const fields = {
@@ -190,9 +190,9 @@ describe('Examples', () => {
 
     it('must be owned by the user', done => {
       chai.request(server)
-        .patch('/examples/' + exampleId)
+        .patch('/presents/' + exampleId)
         .set('Authorization', `Bearer notarealtoken`)
-        .send({ example: fields })
+        .send({ present: fields })
         .end((e, res) => {
           res.should.have.status(401)
           done()
@@ -201,9 +201,9 @@ describe('Examples', () => {
 
     it('should update fields when PATCHed', done => {
       chai.request(server)
-        .patch(`/examples/${exampleId}`)
+        .patch(`/presents/${exampleId}`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ example: fields })
+        .send({ present: fields })
         .end((e, res) => {
           res.should.have.status(204)
           done()
@@ -212,32 +212,32 @@ describe('Examples', () => {
 
     it('shows the updated resource when fetched with GET', done => {
       chai.request(server)
-        .get(`/examples/${exampleId}`)
+        .get(`/presents/${exampleId}`)
         .set('Authorization', `Bearer ${token}`)
         .end((e, res) => {
           res.should.have.status(200)
           res.body.should.be.a('object')
-          res.body.example.title.should.eql(fields.title)
-          res.body.example.text.should.eql(fields.text)
+          res.body.present.title.should.eql(fields.title)
+          res.body.present.text.should.eql(fields.text)
           done()
         })
     })
 
     it('doesn\'t overwrite fields with empty strings', done => {
       chai.request(server)
-        .patch(`/examples/${exampleId}`)
+        .patch(`/presents/${exampleId}`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ example: { text: '' } })
+        .send({ present: { text: '' } })
         .then(() => {
           chai.request(server)
-            .get(`/examples/${exampleId}`)
+            .get(`/presents/${exampleId}`)
             .set('Authorization', `Bearer ${token}`)
             .end((e, res) => {
               res.should.have.status(200)
               res.body.should.be.a('object')
-              // console.log(res.body.example.text)
-              res.body.example.title.should.eql(fields.title)
-              res.body.example.text.should.eql(fields.text)
+              // console.log(res.body.present.text)
+              res.body.present.title.should.eql(fields.title)
+              res.body.present.text.should.eql(fields.text)
               done()
             })
         })
