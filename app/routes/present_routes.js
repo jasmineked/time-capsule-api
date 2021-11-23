@@ -57,4 +57,15 @@ router.delete('/presents/:id', requireToken, (req, res, next) => {
     .catch(next)
 })
 
+// show | GET
+router.get('/presents/:id', requireToken, (req, res, next) => {
+  // req.params.d will be set based on the id in the route
+  Present.findById(req.params.id)
+    .then(handle404)
+  // if findById is successful, respond with 200 and present in JSON form
+    .then(present => res.status(200).json({ present: present.toObject() }))
+  // if an err occurs , pass it to the handler
+    .catch(next)
+})
+
 module.exports = router
