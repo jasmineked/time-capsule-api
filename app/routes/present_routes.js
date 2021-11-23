@@ -2,11 +2,11 @@ const express = require('express')
 const passport = require('passport')
 const Present = require('../models/present')
 const customErrors = require('../../lib/custom_errors')
-// const handle404 = customErrors.handle404
-// const requireOwnership = customErrors.requireOwnership
+const handle404 = customErrors.handle404
+const requireOwnership = customErrors.requireOwnership
 
 // middleware that removes blank fields
-// const removeBlanks = require('../../lib/remove_blank_fields')
+const removeBlanks = require('../../lib/remove_blank_fields')
 
 // passing this as a second arguent to `router.verb` will make it so that a token must be passerd for that route to be avai
 // it will also set to req.user
@@ -38,6 +38,22 @@ router.get('/presents', requireToken, (req, res, next) => {
     // respond with 200 status & JSON of the presents
     .then(presents => res.status(200).json({ presents: presents }))
     // if an err occurs, pass it to handler
+    .catch(next)
+})
+
+// DeSTROY /presents/id#
+router.delete('/presents/:id', requireToken, (req, res, next) => {
+  Present.findById(req.params.id)
+    .then(handle404)
+    .then(present => {
+    // throw an err if current user doesn;t own presents
+      requireOwnership(req, present)
+      // delete the example ONLY if the above didn't throw
+      present.deleteOne()
+    })
+    // send back 204 and no content if the deletion succeeded
+    .then(() => res.sendStatus(204))
+    // if an error occurs, pass it to the handler
     .catch(next)
 })
 
