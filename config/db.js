@@ -1,7 +1,7 @@
 'use strict'
 
 // creating a base name for the mongodb
-const mongooseBaseName = 'time-capsule-api'
+const mongooseBaseName = 'time-capsule'
 
 // create the mongodb uri for development and test
 const database = {

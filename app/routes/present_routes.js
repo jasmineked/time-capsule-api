@@ -27,7 +27,7 @@ router.post('/presents', requireToken, (req, res, next) => {
 })
 
 // INDEX, GET; /presents
-router.get('/presets', requireToken, (req, res, next) => {
+router.get('/presents', requireToken, (req, res, next) => {
   Present.find()
     .then(presents => {
       // presents will be an arr of Mongoose docs
