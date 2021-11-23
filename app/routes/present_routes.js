@@ -68,4 +68,25 @@ router.get('/presents/:id', requireToken, (req, res, next) => {
     .catch(next)
 })
 
+// update
+// patch
+router.patch('/presents/:id', requireToken, removeBlanks, (req, res, next) => {
+  // if the client attempts to change the `owner` property by including a new owner, prevent that by deleting that ey value pair
+  delete req.body.present.owner
+
+  Present.findById(req.params.id)
+    .then(handle404)
+    .then(present => {
+      // pass the `req` object and the Mongoose record to `requireOwnership`
+      // it will throw an err if the current user isnt the owner
+      requireOwnership(req, present)
+
+      // pass the result of Mongoose's `update` to the next `then`
+      return present.updateOne(req.body.present)
+    })
+  // if that succeeded, return 204 and no JSON
+    .then(() => res.sendStatus(204))
+  // if an error occurs pass it to the handler
+    .catch(next)
+})
 module.exports = router
