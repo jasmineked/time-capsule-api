@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const presentSchema = new mongoose.Schema(
+const entrySchema = new mongoose.Schema(
   {
     subject: {
       type: String,
@@ -21,4 +21,4 @@ const presentSchema = new mongoose.Schema(
     timestamps: true
   }
 )
-module.exports = mongoose.model('Present', presentSchema)
+module.exports = mongoose.model('Entry', entrySchema)

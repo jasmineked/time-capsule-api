@@ -1,6 +1,6 @@
 const express = require('express')
 const passport = require('passport')
-const Present = require('../models/present')
+const Entry = require('../models/entry')
 const customErrors = require('../../lib/custom_errors')
 const handle404 = customErrors.handle404
 const requireOwnership = customErrors.requireOwnership
@@ -14,42 +14,42 @@ const requireToken = passport.authenticate('bearer', { session: false })
 
 const router = express.Router()
 
-// CREATE, POST; /presents
-router.post('/presents', requireToken, (req, res, next) => {
-  // set owner of new present to be current user
-  req.body.present.owner = req.user.id
+// CREATE, POST; /entries
+router.post('/entries', requireToken, (req, res, next) => {
+  // set owner of new entry to be current user
+  req.body.entry.owner = req.user.id
 
-  Present.create(req.body.present)
-    .then(present => {
-      res.status(201).json({ present: present.toObject() })
+  Entry.create(req.body.entry)
+    .then(entry => {
+      res.status(201).json({ entry: entry.toObject() })
     })
     .catch(next)
 })
 
-// INDEX, GET; /presents
-router.get('/presents', requireToken, (req, res, next) => {
-  Present.find()
-    .then(presents => {
-      // presents will be an arr of Mongoose docs
+// INDEX, GET; /entries
+router.get('/entries', requireToken, (req, res, next) => {
+  Entry.find()
+    .then(entries => {
+      // entries will be an arr of Mongoose docs
       // we convert each one to POJO using
       // .map & .toObject
-      return presents.map(present => present.toObject())
+      return entries.map(entry => entry.toObject())
     })
-    // respond with 200 status & JSON of the presents
-    .then(presents => res.status(200).json({ presents: presents }))
+    // respond with 200 status & JSON of the entries
+    .then(entries => res.status(200).json({ entries: entries }))
     // if an err occurs, pass it to handler
     .catch(next)
 })
 
-// DeSTROY /presents/id#
-router.delete('/presents/:id', requireToken, (req, res, next) => {
-  Present.findById(req.params.id)
+// DeSTROY /entries/id#
+router.delete('/entries/:id', requireToken, (req, res, next) => {
+  Entry.findById(req.params.id)
     .then(handle404)
-    .then(present => {
-    // throw an err if current user doesn;t own presents
-      requireOwnership(req, present)
+    .then(entry => {
+    // throw an err if current user doesn;t own entries
+      requireOwnership(req, entry)
       // delete the example ONLY if the above didn't throw
-      present.deleteOne()
+      entry.deleteOne()
     })
     // send back 204 and no content if the deletion succeeded
     .then(() => res.sendStatus(204))
@@ -58,31 +58,31 @@ router.delete('/presents/:id', requireToken, (req, res, next) => {
 })
 
 // show | GET
-router.get('/presents/:id', requireToken, (req, res, next) => {
+router.get('/entries/:id', requireToken, (req, res, next) => {
   // req.params.d will be set based on the id in the route
-  Present.findById(req.params.id)
+  Entry.findById(req.params.id)
     .then(handle404)
-  // if findById is successful, respond with 200 and present in JSON form
-    .then(present => res.status(200).json({ present: present.toObject() }))
+  // if findById is successful, respond with 200 and entry in JSON form
+    .then(entry => res.status(200).json({ entry: entry.toObject() }))
   // if an err occurs , pass it to the handler
     .catch(next)
 })
 
 // update
 // patch
-router.patch('/presents/:id', requireToken, removeBlanks, (req, res, next) => {
+router.patch('/entries/:id', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new owner, prevent that by deleting that ey value pair
-  delete req.body.present.owner
+  delete req.body.entry.owner
 
-  Present.findById(req.params.id)
+  Entry.findById(req.params.id)
     .then(handle404)
-    .then(present => {
+    .then(entry => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an err if the current user isnt the owner
-      requireOwnership(req, present)
+      requireOwnership(req, entry)
 
       // pass the result of Mongoose's `update` to the next `then`
-      return present.updateOne(req.body.present)
+      return entry.updateOne(req.body.entry)
     })
   // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))

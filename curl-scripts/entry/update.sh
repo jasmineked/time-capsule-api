@@ -1,7 +1,7 @@
 #!/bin/bash
 
 API="http://localhost:4741"
-URL_PATH="/presents"
+URL_PATH="/entries"
 
 curl "${API}${URL_PATH}/${ID}" \
   --include \
@@ -9,7 +9,7 @@ curl "${API}${URL_PATH}/${ID}" \
   --header "Content-Type: application/json" \
 --header "Authorization: Bearer ${TOKEN}" \
 --data '{
-    "present": {
+    "entry": {
       "subject": "'"${SUBJECT}"'",
       "text": "'"${TEXT}"'"
     }
